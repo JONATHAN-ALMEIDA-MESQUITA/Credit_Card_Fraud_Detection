@@ -3,7 +3,7 @@ import streamlit.components.v1 as components
 
 def render_notebook():
     # Caminho para o arquivo HTML gerado
-    html_file = "C:/Users/User/OneDrive/projetos_dados/ciencia__de_dados/5 - credit_card_fraud_detection/visualization/assets/Credit_Card_Fraud_Detection.html"
+    html_file = "assets/Credit_Card_Fraud_Detection.html"
 
     try:
         # Ler o conteúdo do arquivo HTML
@@ -16,3 +16,5 @@ def render_notebook():
         st.error(f"Arquivo não encontrado: {html_file}")
     except Exception as e:
         st.error(f"Erro ao carregar o arquivo: {e}")
+
+

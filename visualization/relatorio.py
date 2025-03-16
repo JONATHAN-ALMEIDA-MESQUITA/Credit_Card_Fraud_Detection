@@ -9,10 +9,10 @@ import plotly.express as px
 @st.cache_data
 def render_relatorio():
 
-    st.title('📊 Relatorio analise exploratoria detecção de fraudes!')
+    st.title('📊 Relatorio: Analise exploratoria detecção de fraudes!')
 
     # Carregando os dados
-    df = pd.read_csv("C:/Users/User/OneDrive/projetos_dados/ciencia__de_dados/5 - credit_card_fraud_detection/data/fraudTest.csv", index_col="Unnamed: 0")
+    df = pd.read_csv("assets/fraudTest.csv", index_col="Unnamed: 0")
     
     # Agrupando os dados por categoria
     df_cat = df.groupby('category').agg(
@@ -79,7 +79,7 @@ def render_relatorio():
         - Isso sugere que **transações online podem estar mais suscetíveis a fraudes**, possivelmente devido à **falta de verificação presencial** ou ao uso de **métodos de pagamento menos seguros**.  
 
         - Além disso, **compras em mercados físicos** (`grocery_pos`) também apresentam uma **alta incidência de fraudes**:  
-        - 🏪 **Grocery_pos:** **485 casos** e uma taxa de **0,92%**.  
+        - 🏪 **Grocery_pos:** **53k devendas** e uma taxa de **0,92%** de fraudes.  
         - Isso pode estar relacionado ao **alto volume de transações** nessa categoria ou a **vulnerabilidades específicas no processo de pagamento**.  
 
         - Por outro lado, categorias como **`home`**, **`kids_pets`** e **`personal_care`** têm as **menores taxas de fraude**, indicando que **esses setores podem ser mais seguros ou menos visados por fraudadores**.  
