@@ -1,0 +1,8 @@
+services:
+  streamlit:
+    container_name: "Fraud_detect"
+    build:
+      dockerfile: ./Dockerfile
+      context: ./
+    ports:
+     - '8501:8501'

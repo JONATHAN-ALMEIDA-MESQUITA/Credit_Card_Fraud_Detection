@@ -3,8 +3,11 @@ from about import render_about
 from relatorio import render_relatorio
 from notebook import render_notebook
 
-st.set_page_config(layout='wide', page_title='Fraud_detect')
 
+st.set_page_config(
+    layout="wide",
+    initial_sidebar_state="auto"
+)
 
 
 menu = st.sidebar.radio(
@@ -19,3 +22,4 @@ menu_functions= {
 }
 
 menu_functions[menu]()
+

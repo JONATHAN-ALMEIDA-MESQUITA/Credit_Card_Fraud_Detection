@@ -2,23 +2,21 @@ import streamlit as st
 from utils import get_image_as_base64
 
 
-
-
 def render_about():
 
     st.title('🔍 Ola seja bem vindo ao projeto de detecção de fraudes!')
+
     
-    col1, col2 = st.columns([1, 2])
 
     img_about = get_image_as_base64("assets/FC_IMAGE.png")
 
-    col1.markdown(f"""
+    st.markdown(f"""
     <div style="margin-top: 100px;"></div>
-    <img src="data:image/png;base64,{img_about}" width=500">
+    <img src="data:image/png;base64,{img_about}">
     """, unsafe_allow_html=True
     )
 
-    col2.markdown("""
+    st.markdown("""
         <div style="margin-top: 100px;"></div>
 
         ### O que você verá neste projeto 🚀:

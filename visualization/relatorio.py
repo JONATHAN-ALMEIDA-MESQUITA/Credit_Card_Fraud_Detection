@@ -5,11 +5,9 @@ from plotly.subplots import make_subplots
 import plotly.express as px
 
 
-
 @st.cache_data
 def render_relatorio():
-
-    st.title('📊 Relatorio: Analise exploratoria detecção de fraudes!')
+    st.title('📊 Relatório: Análise Exploratória de Detecção de Fraudes')
 
     # Carregando os dados
     df = pd.read_csv("assets/fraudTest.csv", index_col="Unnamed: 0")
@@ -62,77 +60,74 @@ def render_relatorio():
             x=0.6, 
             y=1.1,
             orientation='h'  # Posiciona a legenda horizontalmente
-        )
+        ),
+        autosize=True,  # Ajusta o tamanho automaticamente
+        margin=dict(l=20, r=20, t=40, b=20),  # Ajusta as margens
+        font=dict(size=14)  # Aumenta o tamanho da fonte
     )
 
     # Exibindo o gráfico no Streamlit
     st.plotly_chart(fig, use_container_width=True)
 
     with st.expander("##### 📌 Conclusão Fraude por Categoria de Compras:", expanded=False):
-
         st.markdown("""
-        
-
         - Ao analisar as **categorias**, observa-se que **compras online** (`shopping_net` e `misc_net`) possuem as **maiores taxas de fraude**:  
-        - 🛒 **Shopping_net:** **1,21%** **(Linha azul do grafico)** 
-        - 💳 **Misc_net:** **0,98%**  **(Linha azul do grafico)** 
+        - 🛒 **Shopping_net:** **1,21%** **(Linha azul do gráfico)** 
+        - 💳 **Misc_net:** **0,98%**  **(Linha azul do gráfico)** 
         - Isso sugere que **transações online podem estar mais suscetíveis a fraudes**, possivelmente devido à **falta de verificação presencial** ou ao uso de **métodos de pagamento menos seguros**.  
 
         - Além disso, **compras em mercados físicos** (`grocery_pos`) também apresentam uma **alta incidência de fraudes**:  
-        - 🏪 **Grocery_pos:** **53k devendas** e uma taxa de **0,92%** de fraudes.  
+        - 🏪 **Grocery_pos:** **53k de vendas** e uma taxa de **0,92%** de fraudes.  
         - Isso pode estar relacionado ao **alto volume de transações** nessa categoria ou a **vulnerabilidades específicas no processo de pagamento**.  
 
         - Por outro lado, categorias como **`home`**, **`kids_pets`** e **`personal_care`** têm as **menores taxas de fraude**, indicando que **esses setores podem ser mais seguros ou menos visados por fraudadores**.  
 
         💡 **Essa análise destaca a importância de reforçar medidas de segurança, especialmente em transações online e em mercados físicos, para reduzir a incidência de fraudes.**  
-
         """)
 
-
-    #Analise por pessoas
-
+    # Análise por gênero
     df_gender = df.groupby('gender').agg(
-        qtd_trans = ('trans_num', 'count'),
-        qtd_fraud = ('is_fraud', 'sum'),
-        mean_fraud = ('is_fraud', lambda x: (x.mean()*100).round(2))
-        ).assign(
-        prop_trans= lambda x : (x['qtd_trans'] / x['qtd_trans'].sum()*100).round(2),
-        prop_fraud= lambda x : (x['mean_fraud'] / x['mean_fraud'].sum()*100).round(2)
-        ).reset_index()
+        qtd_trans=('trans_num', 'count'),
+        qtd_fraud=('is_fraud', 'sum'),
+        mean_fraud=('is_fraud', lambda x: (x.mean() * 100).round(2))
+    ).assign(
+        prop_trans=lambda x: (x['qtd_trans'] / x['qtd_trans'].sum() * 100).round(2),
+        prop_fraud=lambda x: (x['mean_fraud'] / x['mean_fraud'].sum() * 100).round(2)
+    ).reset_index()
 
-        #Grafico de proporção de fraud entre genero
-
-    fig = make_subplots(rows=1, cols=3, subplot_titles=('Quantidade de transações por genero', 'Quantidade de fraudes por genero', 'Quantidade de transações'))
-
-
+    # Gráfico de proporção de fraudes entre gêneros
+    fig = make_subplots(
+        rows=1, cols=3,
+        subplot_titles=('Quantidade de Transações por Gênero', 'Quantidade de Fraudes por Gênero', 'Média de Fraudes por Gênero'),
+        horizontal_spacing=0.1  # Ajusta o espaçamento entre subplots
+    )
 
     fig.add_trace(go.Bar(
         x=df_gender['gender'],
         y=df_gender['qtd_trans'],
-        name='Média de fraudes(%)', 
+        name='Quantidade de Transações', 
         marker_color='lemonchiffon', 
-        text=df_gender['qtd_trans'].apply(lambda x : f'{x/1000: .0f}k'),
-        textposition='auto'), row=1, col=1)
-
+        text=df_gender['qtd_trans'].apply(lambda x: f'{x/1000:.0f}k'),
+        textposition='auto'
+    ), row=1, col=1)
 
     fig.add_trace(go.Bar(
         x=df_gender['gender'],
         y=df_gender['qtd_fraud'], 
-        name='Quatidade de fraudes',
+        name='Quantidade de Fraudes',
         marker_color='lightblue',
-        text=df_gender['qtd_fraud'].apply(lambda x : f'{x:,}'.replace(',',".")),
-        textposition='auto'), row=1, col=2)
-
-
+        text=df_gender['qtd_fraud'].apply(lambda x: f'{x:,}'.replace(',', '.')),
+        textposition='auto'
+    ), row=1, col=2)
 
     fig.add_trace(go.Bar(
         x=df_gender['gender'],
         y=df_gender['mean_fraud'],
-        name='Média de fraudes(%)', 
+        name='Média de Fraudes (%)', 
         marker_color='lightcoral', 
-        text=df_gender['mean_fraud'].apply(lambda x : f'{x: .2f}%'),
-        textposition='auto'), row=1, col=3)
-
+        text=df_gender['mean_fraud'].apply(lambda x: f'{x:.2f}%'),
+        textposition='auto'
+    ), row=1, col=3)
 
     # Ajustando o layout
     fig.update_layout(
@@ -142,23 +137,23 @@ def render_relatorio():
             x=0.3,
             y=-0.3,
             orientation='h'       
-        ))
+        ),
+        margin=dict(l=20, r=20, t=40, b=20),  # Ajusta as margens
+        font=dict(size=12)  # Aumenta o tamanho da fonte
+    )
 
-    #Atualizar titulo dos eixos
-    fig.update_xaxes(title_text = 'Genero', row=1 ,col=1)
-    fig.update_yaxes(title_text = 'Média', row=1 ,col=1)
-    fig.update_xaxes(title_text = 'Genero', row=1 ,col=2)
-    fig.update_yaxes(title_text = 'Quantidade', row=1 ,col=2)
-    fig.update_xaxes(title_text = 'Genero', row=1 ,col=3)
-    fig.update_yaxes(title_text = 'Quantidade', row=1 ,col=3)
-
+    # Atualizar títulos dos eixos
+    fig.update_xaxes(title_text='Gênero', row=1, col=1)
+    fig.update_yaxes(title_text='Quantidade', row=1, col=1)
+    fig.update_xaxes(title_text='Gênero', row=1, col=2)
+    fig.update_yaxes(title_text='Quantidade', row=1, col=2)
+    fig.update_xaxes(title_text='Gênero', row=1, col=3)
+    fig.update_yaxes(title_text='Média (%)', row=1, col=3)
 
     st.plotly_chart(fig, use_container_width=True)
 
-    with st.expander("##### 📌 Conclusão Comparação por Gênero :", expanded=False):
-
+    with st.expander("##### 📌 Conclusão Comparação por Gênero:", expanded=False):
         st.markdown("""
-
         - O número total de transações de pessoas do gênero **F** (**305k**) é **maior** que o de pessoas do gênero **M** (**251k**).  
         - A quantidade **absoluta** de fraudes para **F** (**1.164**) também é maior do que para **M** (**981**).  
 
@@ -170,21 +165,17 @@ def render_relatorio():
 
         > A taxa de fraude sendo parecida indica que a **probabilidade de uma transação ser fraudulenta** não varia muito entre os gêneros.  
         > O fato de **F** ter mais fraudes absolutas ocorre simplesmente porque **há mais transações desse grupo**. 
-    
         """)
 
-
-    #Converter a coluna de data e hore em datetime
+    # Análise por hora
     df['trans_date_trans_time'] = pd.to_datetime(df['trans_date_trans_time'])
-    #Extrair hora formatada em H:M:S usanto strftime
     df['hour'] = df['trans_date_trans_time'].dt.strftime('%H:%M:%S')
     df['only_hour'] = df['trans_date_trans_time'].dt.strftime('%H')
 
     df_hour = df.groupby('only_hour').agg(
-    qtd_fraud = ('is_fraud', 'sum'),
-    mean_fraud = ('is_fraud', lambda x: (x.mean()*100).round(2))
+        qtd_fraud=('is_fraud', 'sum'),
+        mean_fraud=('is_fraud', lambda x: (x.mean() * 100).round(2))
     ).reset_index().sort_values(by='mean_fraud', ascending=False)
-
 
     # Criando o gráfico
     fig = go.Figure()
@@ -193,7 +184,7 @@ def render_relatorio():
     fig.add_trace(go.Bar(
         x=df_hour['only_hour'], 
         y=df_hour['qtd_fraud'], 
-        name='Quantidade de Fraudess',
+        name='Quantidade de Fraudes',
         marker_color='lemonchiffon',
         text=df_hour['qtd_fraud'],
         textposition='auto'
@@ -201,55 +192,46 @@ def render_relatorio():
 
     # Ajustando o layout
     fig.update_layout(
-        title='Distribuição de Fraudess por Hora',
-        title_x = 0.5,
+        title='Distribuição de Fraudes por Hora',
+        title_x=0.5,
         xaxis_title='Hora',
-        yaxis_title='Quantidade de Fraudess',
-        template='plotly_dark'
+        yaxis_title='Quantidade de Fraudes',
+        template='plotly_dark',
+        margin=dict(l=20, r=20, t=40, b=20),  # Ajusta as margens
+        font=dict(size=14)  # Aumenta o tamanho da fonte
     )
 
     # Exibindo o gráfico
     st.plotly_chart(fig, use_container_width=True)
 
-
-    with st.expander("##### 📌 Conclusão Pico de fraudes (hora)", expanded=False):
-
+    with st.expander("##### 📌 Conclusão Pico de Fraudes (Hora):", expanded=False):
         st.markdown("""
-
         **🔴 Pico de fraudes entre 22h e 23h:**  
-
         - O maior índice de transações fraudulentas ocorre entre **22h e 23h**, com **550 e 538 fraudes**, respectivamente.  
         - Isso indica um **período crítico** onde as fraudes são mais frequentes.  
 
         **📉 Redução nas primeiras horas da madrugada:**  
-
         - Entre **00h e 03h**, há uma redução significativa (**cerca de 65%**) no número de fraudes em comparação com o pico das **22h-23h**.  
         - Isso sugere que, embora ainda haja uma incidência alta de fraudes nesse período, ela é **menor** do que no pico inicial.  
 
         **🟢 Períodos de menor incidência:**  
-
         - Das **04h às 21h**, a quantidade de fraudes é significativamente **menor**, com valores abaixo de **40 fraudes por hora**.  
         - Isso indica que esses horários são **menos críticos**.  
 
         **🔐 Ações de segurança:**  
-
         - Aumentar os **critérios de segurança** durante os horários de pico (**22h-23h**) e nas primeiras horas da madrugada (**00h-03h**).  
         - Isso pode incluir **verificação adicional de transações, autenticação de dois fatores ou monitoramento mais rigoroso**.  
 
         **📊 Uso da variável para treinamento do modelo:**  
-
         - A variável **`only_hour`** parece ter uma **alta correlação** com a ocorrência de fraudes, o que a torna uma **feature relevante** para o modelo de classificação.  
         - Incluir essa variável pode **melhorar a precisão** do modelo ao prever transações fraudulentas.    
-        dulentas.
-
-
         """)
 
-    
+    # Análise por dia da semana
     df['day'] = df['trans_date_trans_time'].dt.day_name()
     df_heatmap = df.groupby(['only_hour', 'day']).agg(
         qtd_fraud=('is_fraud', 'sum') 
-    ).reset_index().sort_values(by= 'qtd_fraud', ascending=False)
+    ).reset_index().sort_values(by='qtd_fraud', ascending=False)
 
     fig = px.density_heatmap(
         df_heatmap,
@@ -266,108 +248,95 @@ def render_relatorio():
     fig.update_layout(
         xaxis_title='Hora',
         yaxis_title='Dia da Semana',
-        template='plotly_dark'
+        template='plotly_dark',
+        margin=dict(l=20, r=20, t=40, b=20),  # Ajusta as margens
+        font=dict(size=14)  # Aumenta o tamanho da fonte
     )
 
     st.plotly_chart(fig, use_container_width=True)
 
-
-    with st.expander('##### 📌Conclusão dia com maior numero de fraudes', expanded=False):
-
+    with st.expander('##### 📌 Conclusão Dia com Maior Número de Fraudes:', expanded=False):
         st.markdown("""
-
-
         O domingo apresenta o maior pico de fraudes, com **105 fraudes às 22h** e **101 fraudes às 23h**.  
 
         Outros dias da semana também mostram picos significativos, especialmente:  
-
         - **Quinta-feira (Thursday):** 78 fraudes às 22h e 82 fraudes às 23h.  
-        - **Terça-feira (Tuesday):** 89 fraudes às 22h e 73 fraudes às   
+        - **Terça-feira (Tuesday):** 89 fraudes às 22h e 73 fraudes às 23h.  
 
         ---
 
         **📊 Impacto do Dia da Semana**  
-
         Embora o **domingo** tenha o maior número absoluto de fraudes, os outros dias da semana também apresentam picos consistentes, especialmente entre **22h e 23h**.  
 
-        📍 Isso sugere que **o horário tem um impacto mais significativo do que o dia emana**.  
+        📍 Isso sugere que **o horário tem um impacto mais significativo do que o dia da semana**.  
 
         ---
 
         **⏰ Horários de Pico**  
-
         - Os horários entre **22h e 23h** são consistentemente os mais críticos em todos os dias da semana, com uma média de **70 a 100 fraudes** nesse período.  
-        - Fora desse horário, a quantidade de fraudes **cai drasticamente**, com a maioria dos dias registrando menos de **10 des por hora**.  
+        - Fora desse horário, a quantidade de fraudes **cai drasticamente**, com a maioria dos dias registrando menos de **10 fraudes por hora**.  
 
         ---
 
         **✅ Recomendações**  
-
         ✔️ **Reforçar a segurança** durante os horários de pico (**22h-23h**) em todos os dias da semana.  
         ✔️ **Monitorar especialmente o domingo**, que apresenta os maiores picos de fraudes.  
         ✔️ **Considerar a implementação de verificações adicionais** ou **autenticação de dois fatores** durante esses horários críticos.  
-       
-     """)
-        
+        """)
 
-
- 
-
-    mes= { 1 : '01-jan', 2: '02-feb', 3: 'mar', 4: '04-apr', 5: '05-mai', 6: '06-jun', 
-        7 : '07-jul', 8:'08-ago', 9: '09-sep', 10: '10-oct', 11: '11-nov', 12: '12-dec'}
+    # Análise por mês
+    mes = {1: '01-jan', 2: '02-feb', 3: '03-mar', 4: '04-apr', 5: '05-mai', 6: '06-jun', 
+           7: '07-jul', 8: '08-ago', 9: '09-sep', 10: '10-oct', 11: '11-nov', 12: '12-dec'}
 
     df['month'] = df['trans_date_trans_time'].dt.month.map(mes)
 
     df_month = df.groupby('month').agg(
-        qtd_trans = ('trans_num', 'count'),
-        qtd_fraud = ('is_fraud', 'sum'),
-        mean_fraud = ('is_fraud', lambda x  :(x.mean()*100).round(2)),
-        total_preju = ('amt', lambda x: x[df['is_fraud']== 1].sum())
+        qtd_trans=('trans_num', 'count'),
+        qtd_fraud=('is_fraud', 'sum'),
+        mean_fraud=('is_fraud', lambda x: (x.mean() * 100).round(2)),
+        total_preju=('amt', lambda x: x[df['is_fraud'] == 1].sum())
     ).assign(
-        fraud_ratio = lambda x : (x['qtd_trans'] / x['qtd_fraud']).astype(int)
-    ).reset_index().sort_values(by= 'month', ascending=True)
+        fraud_ratio=lambda x: (x['qtd_trans'] / x['qtd_fraud']).astype(int)
+    ).reset_index().sort_values(by='month', ascending=True)
 
-    fig = make_subplots(rows=2, cols=1, subplot_titles=('Quantidade de transações fraudulentas','Prejuizo financeiro de transações fraudadas'), 
-                        vertical_spacing=0.20)
-
+    fig = make_subplots(
+        rows=2, cols=1,
+        subplot_titles=('Quantidade de Transações Fraudulentas', 'Prejuízo Financeiro de Transações Fraudadas'),
+        vertical_spacing=0.20
+    )
 
     fig.add_trace(go.Bar(
         x=df_month['month'],
         y=df_month['qtd_fraud'],
-        marker_color= 'lightblue',
-        text=df_month['qtd_fraud']), row=1, col=1)
-
-
+        marker_color='lightblue',
+        text=df_month['qtd_fraud']
+    ), row=1, col=1)
 
     fig.add_trace(go.Bar(
         x=df_month['month'],
         y=df_month['total_preju'],
-        marker_color= 'lemonchiffon',
-        text=df_month['total_preju'].apply(lambda x : f'{x/1000: .0f}k')), row=2, col=1)
-
-
+        marker_color='lemonchiffon',
+        text=df_month['total_preju'].apply(lambda x: f'{x/1000:.0f}k')
+    ), row=2, col=1)
 
     # Ajustando o layout
     fig.update_layout(
         height=600,
-        title='Analise financeira',
+        title='Análise Financeira',
         template='plotly_dark',
         showlegend=False,
-        )
+        margin=dict(l=20, r=20, t=40, b=20),  # Ajusta as margens
+        font=dict(size=14)  # Aumenta o tamanho da fonte
+    )
 
-    #Atualizar titulo dos eixos
-    fig.update_yaxes(title_text = 'Qtd. fraudes', row=1 ,col=1)
-    fig.update_yaxes(title_text = 'Valor transações', row=2 ,col=1)
-
+    # Atualizar títulos dos eixos
+    fig.update_yaxes(title_text='Qtd. Fraudes', row=1, col=1)
+    fig.update_yaxes(title_text='Valor Transações', row=2, col=1)
 
     st.plotly_chart(fig, use_container_width=True)
 
-
-    with st.expander('##### 📌 Conclusão quantidade de fraudes por mês:', expanded=False):
-
+    with st.expander('##### 📌 Conclusão Quantidade de Fraudes por Mês:', expanded=False):
         st.markdown("""
-
-
         1. **Junho:**
         - Em junho, foram realizadas **30 mil transações**, com uma **média de fraudes de 0,44%**. Isso significa que, a cada **226 transações legítimas**, **1 fraude** foi detectada, gerando um **prejuízo financeiro de 73 mil**.
         - Esse mês apresenta um **índice de fraudes moderado**, mas ainda assim relevante, considerando o volume total de transações.
@@ -384,11 +353,9 @@ def render_relatorio():
         ---
 
         #### 📌 Resumo:
-
         - **Outubro** foi o mês com o **maior índice de fraudes**, com **1 fraude a cada 180 transações**. Esse período merece atenção especial, pois, além do alto percentual de fraudes, também teve um **volume significativo de transações**.
         - **Dezembro**, apesar de ter o **maior volume de transações (140 mil)**, apresentou o **menor índice de fraudes (0,18%)**, sendo o mês mais seguro.
         - **Junho** teve um **índice de fraudes moderado (0,44%)**, com **1 fraude a cada 226 transações**.
 
         **Observação importante:** Como não temos dados completos para os meses de **janeiro a maio**, não é possível afirmar se outubro é realmente o mês com o maior índice de fraudes ao longo de todo o ano. No entanto, com base nos dados disponíveis, outubro se destaca como o período de maior risco.
-
-            """)
+        """)
